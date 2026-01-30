@@ -1,0 +1,6 @@
+name: LuckyItemFight
+version: '1.0'
+main: org.luckyItemFight.LuckyItemFight
+api-version: '1.20'
+authors: [ AluminumNitrate(AcidAluminum) with Jason31416 ]
+description: A Tower Battle in Minecraft

@@ -1,0 +1,25 @@
+common:
+  player-join: "<#62FF37>+ <#FFFFFF>%player%"
+  player-leave: "<#F72828>- <#FFFFFF>%player%"
+
+command:
+  leave-but-not-in-a-game: "<#F72828>错误: <#FFFFFF>你本来就不在一个房间里"
+
+in-game:
+  leave: "<#F72828>- <#FFFFFF>玩家 %player% 离开了房间"
+  eliminate: "<#82FF99> 玩家 %player% 淘汰了"
+  eliminate-by-other: "<#82FF990> 玩家 %victim% 被 %killer% 淘汰了"
+  alive-award: "<#82FF990> 你因为存活而获取了 %award% 积分"
+  kill-award: "<#82FF990> 你因为击杀而获取了 %award% 积分"
+
+  leaderboard:
+    header: "<#C7FF85>================游戏结算================"
+    _1st: "<#FFD700> %player% - [%score%] %it-is-me%"
+    _2nd: "<#E8E8E8> %player% - [%score%] %it-is-me%"
+    _3rd: "<#B87333> %player% - [%score%] %it-is-me%"
+    normal: "<#FFFFFF> %player% - [%score%] %it-is-me%"
+    it-is-me: "<#82FF990><- 你在这里"
+    footer: "<#C7FF85>================游戏结算================"
+
+actionbar:
+  countdown: "<#24EAFF>游戏将在 %time% 后开始"
