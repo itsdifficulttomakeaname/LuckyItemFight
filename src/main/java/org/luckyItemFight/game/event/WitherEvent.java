@@ -27,27 +27,7 @@ public class WitherEvent extends AbstractEvent{
         if(location.length < 3) throw new PluginException("ERROR While Playing", "Location of spawning wither is illegal");
         Location loc = new Location(gameInstance.getGameWorld(), Double.parseDouble(location[0]), Double.parseDouble(location[1]), Double.parseDouble(location[2]));
         wither = gameInstance.getGameWorld().spawnEntity(loc, EntityType.WITHER);
-        boolean showName = config.getBoolean("show-name.enable");
-        boolean showDetail = config.getBoolean("show-detail.enable");
-        String name,nameType,detail,detailType;
-        if(showName) {
-            name = config.getString("show-name.text");
-            nameType = config.getString("show-name.type");
-        } else {
-            name = "";
-            nameType = "";
-        }
-        if(showDetail) {
-            detail = config.getString("show-detail.text");
-            detailType = config.getString("show-detail.type");
-        } else {
-            detail = "";
-            detailType = "";
-        }
-        gameInstance.getPlayers().forEach((p,s) -> {
-            send(p, nameType, name, showName);
-            send(p, detailType, detail, showDetail);
-        });
+        send(config, gameInstance);
     }
 
     /**

@@ -60,7 +60,6 @@ public class GameInstance {
 
     public static void init() {
         try {
-//            randomItems = MapTree.fromYaml(new String(Main.class.getClassLoader().getResourceAsStream("__randomlist__.yml").readAllBytes()));
             randomItems = MapTree.fromYaml(Files.readString(new File(instance.getDataFolder(), "__randomlist__.yml").toPath()));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -101,7 +100,7 @@ public class GameInstance {
     }
     @Getter private static final Map<GameInstance, List<Killer>> killerLeaderboard = new HashMap<>();
     private final WrappedTask tickTask;
-    private boolean ending;
+    private final Object ending = new Object();
 
 
     public MapTree getWorldConfig() {
@@ -113,7 +112,6 @@ public class GameInstance {
         worldInstances.put(world.getName(), this);
         killerLeaderboard.put(this, new ArrayList<>());
         startingInstance = this;
-        ending = false;
         AbstractEvent.getEvents().getKeys().forEach(k -> events.put(k, AbstractEvent.getEvents().getInt(k + ".possibility")));
         AbstractEvent.getEvents().getStringList("BlockIsNotAllowedEvent.items").forEach(s -> BlockIsNotAllowedEventMaterial.add(Material.valueOf(s)));
         loadConfig();
@@ -142,7 +140,7 @@ public class GameInstance {
     }
 
     public static void initRandomItemList() {
-        var section = randomItems.getSection("items");
+        MapTree section = randomItems.getSection("items");
         if(section == null) throw new PluginException("ERROR While Loading", "__randomlist__.yml -> items section is null");
         for(String key : section.getKeys()) {
             List<String> items = (List<String>) section.get(key);
@@ -240,6 +238,7 @@ public class GameInstance {
         player.getPlayer().setGameMode(GameMode.SPECTATOR);
         if (player.isOnline()) {
             String[] ret = getWorldConfig().getString("spectator-spawn-location").split(",");
+            if(ret.length < 3) throw new PluginException("ERROR While Playing", "Spectator's spawn-location has fewer than 3 arguments!");
             SimpleLocation loc = SimpleLocation.of(
                     Double.parseDouble(ret[0]),
                     Double.parseDouble(ret[1]),
@@ -260,7 +259,7 @@ public class GameInstance {
         if (victim.isOnline()) {
             victim.getPlayer().setGameMode(GameMode.SPECTATOR);
             String[] ret = getWorldConfig().getString("spectator-spawn-location").split(",");
-            if(ret.length < 3) throw new PluginException("ERROR While Playing", "Spectator's spawn-location has fewer than 3 arguments");
+            if(ret.length < 3) throw new PluginException("ERROR While Playing", "Spectator's spawn-location has fewer than 3 arguments!");
             SimpleLocation loc = SimpleLocation.of(
                     Double.parseDouble(ret[0]),
                     Double.parseDouble(ret[1]),
@@ -294,17 +293,18 @@ public class GameInstance {
     }
 
     public void endGame() {
-        if(ending) return;
-        ending = true; // 锁，防止二次调用
+        synchronized (ending){
+            if (alivePlayers == 1) {
+                players.forEach((p, s) -> {
+                    if (s.equals(PlayerState.ALIVE)) leaderboard.add(p);
+                });
+            }
 
-        if(alivePlayers == 1) {
-            players.forEach((p,s) -> { if(s.equals(PlayerState.ALIVE)) leaderboard.add(p); });
+            Collections.reverse(leaderboard);
+            showLeaderBoard();
+
+            destroy();
         }
-
-        Collections.reverse(leaderboard);
-        showLeaderBoard();
-
-        destroy();
     }
 
     private void showLeaderBoard() {
@@ -447,10 +447,12 @@ public class GameInstance {
         return new GameInstance(createWorld(sb.toString()));
     }
 
+    public static WrappedTask scoreboardTask;
+
     // 本方法存在大量本地数据库读(没有"写"这个操作)
     @SneakyThrows
     public static void scoreboardTask() {
-        PlanetLib.getScheduler().runTimer(wrappedTask ->
+        scoreboardTask = PlanetLib.getScheduler().runTimer(() ->
                 ScoreboardManager.getPlayerScoreboard().forEach((player, scoreboardManager) -> {
                     GameInstance gameInstance = GameInstance.getPlayerInstances().get(player);
                     if(gameInstance == null || gameInstance.getState().equals(GameState.WAITING)) {
@@ -497,9 +499,10 @@ public class GameInstance {
         }),1,1, TimeUnit.SECONDS);
     }
 
+    public static WrappedTask worldsCleanTask;
 
     public static void worldsCleanTask() {
-        PlanetLib.getScheduler().runTimer(wrappedTask -> {
+        worldsCleanTask = PlanetLib.getScheduler().runTimer(() -> {
             final Set<String> canDelete = new HashSet<>();
             for(Map.Entry<String, GameInstance> entry : everUsedWorlds.entrySet()) {
                 String world = entry.getKey();

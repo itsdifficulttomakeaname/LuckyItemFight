@@ -41,27 +41,7 @@ public class ArrowEvent extends AbstractEvent{
             arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED); // 禁止捡起
         }), config.getInt("duration"), config.getInt("duration"));
 
-        boolean showName = config.getBoolean("show-name.enable");
-        boolean showDetail = config.getBoolean("show-detail.enable");
-        String name,nameType,detail,detailType;
-        if(showName) {
-            name = config.getString("show-name.text");
-            nameType = config.getString("show-name.type");
-        } else {
-            name = "";
-            nameType = "";
-        }
-        if(showDetail) {
-            detail = config.getString("show-detail.text");
-            detailType = config.getString("show-detail.type");
-        } else {
-            detail = "";
-            detailType = "";
-        }
-        gameInstance.getPlayers().forEach((p,s) -> {
-            send(p, nameType, name, showName);
-            send(p, detailType, detail, showDetail);
-        });
+        send(config, gameInstance);
     }
 
     /**

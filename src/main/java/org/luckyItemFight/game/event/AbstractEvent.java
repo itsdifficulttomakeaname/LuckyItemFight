@@ -23,16 +23,51 @@ public abstract class AbstractEvent{
     static final String CHAT = "chat";
     public static AbstractEvent fromString(String name,GameInstance gameInstance) {
         return switch (name) {
-//            case "WitherEvent" -> new WitherEvent(gameInstance);
             case "ArrowEvent" -> new ArrowEvent(gameInstance);
             case "NullEvent" -> new NullEvent(gameInstance);
             case "BlockIsNotAllowedEvent" -> new BlockIsNotAllowedEvent(gameInstance);
             case "NightEvent" -> new NightEvent(gameInstance);
+            case "BlockDisAppearEvent" -> new BlockDisAppearEvent(gameInstance);
             default -> null;
         };
     }
+    /**
+     * 发送提示消息的工具方法
+     * @param config 对应事件的配置段
+     * @param gameInstance 该事件的源游戏实例
+     * */
+    void send(MapTree config, GameInstance gameInstance) {
+        boolean showName = config.getBoolean("show-name.enable");
+        boolean showDetail = config.getBoolean("show-detail.enable");
+        String name,nameType,detail,detailType;
+        if(showName) {
+            name = config.getString("show-name.text");
+            nameType = config.getString("show-name.type");
+        } else {
+            name = "";
+            nameType = "";
+        }
+        if(showDetail) {
+            detail = config.getString("show-detail.text");
+            detailType = config.getString("show-detail.type");
+        } else {
+            detail = "";
+            detailType = "";
+        }
+        gameInstance.getPlayers().forEach((p,s) -> {
+            send(p, nameType, name, showName);
+            send(p, detailType, detail, showDetail);
+        });
+    }
 
-    void send(SimplePlayer p, String type, String text, boolean run) {
+    /**
+     * 分类方式发送信息的方法
+     * @param p 发送的目标玩家
+     * @param type 目标方式
+     * @param text 发送的消息
+     * @param run 是否发送
+     * */
+    private void send(SimplePlayer p, String type, String text, boolean run) {
         if(!run) return;
         if (type.equalsIgnoreCase(TITLE))
             p.getPlayer().showTitle(Title.title(Message.of(text).toComponent(), Message.of("").toComponent()));
@@ -44,7 +79,6 @@ public abstract class AbstractEvent{
 
     public static void init() {
         try {
-//            events = MapTree.fromYaml(new String(Main.class.getClassLoader().getResourceAsStream("__event__.yml").readAllBytes()));
             events = MapTree.fromYaml(Files.readString(new File(instance.getDataFolder(), "__event__.yml").toPath()));
         } catch (IOException e) {
             throw new PluginException("ERROR While Loading","Cannot initialize __event__.yml",e);

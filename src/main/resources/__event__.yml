@@ -128,6 +128,23 @@ NightEvent:
     enable: true
     type: chat
     text: "<#FFFFFF>我们从来没有战胜黑夜...\n(5min后天亮)"
+BlockDisAppearEvent:
+  possibility: 5
+  multiExecute: true
+  executePerXTick: 4 # 4 ticks 执行一次
+  executeTimes: 10 # 执行十次
+  end-in-duration:
+    enable: false # 不推荐启用
+    duration: 240
+  sound: "null" # null 没声音
+  show-name:
+    enable: true
+    type: subtitle # title | subtitle | chat
+    text: "<#FFFFFF> 腐蚀..."
+  show-detail:
+    enable: true
+    type: chat
+    text: "周围的方块逐渐消失\n不过不用担心掉下去qwqqqqq\n(执行10次)"
 NullEvent:
   possibility: 50
   multiExecute: true

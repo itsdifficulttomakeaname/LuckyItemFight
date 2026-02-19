@@ -65,6 +65,17 @@ public final class Main extends JavaPlugin {
         for(var gi: GameInstance.getWorldInstances().values()){
             gi.resetWorld();
         }
+
+        if(GameInstance.scoreboardTask != null && !GameInstance.scoreboardTask.isCancelled()) {
+            GameInstance.scoreboardTask.cancel();
+            GameInstance.scoreboardTask = null;
+        }
+
+        if(GameInstance.worldsCleanTask != null && !GameInstance.worldsCleanTask.isCancelled()) {
+            GameInstance.worldsCleanTask.cancel();
+            GameInstance.worldsCleanTask = null;
+        }
+
         dataBaseManager.close();
         ShopCommand.getGui().destroy();
     }

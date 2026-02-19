@@ -4,6 +4,8 @@ import cn.jason31416.planetlib.util.Config;
 import cn.jason31416.planetlib.util.Lang;
 import cn.jason31416.planetlib.wrapper.SimplePlayer;
 import lombok.Getter;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.Audiences;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;
@@ -46,10 +48,7 @@ public class GameTask implements Runnable {
         if (gameInstance.getState() == GameState.WAITING) {
             if (gameInstance.getWaitingTime() != Integer.MAX_VALUE) {
                 for (var player : gameInstance.getPlayers().keySet()) {
-                    player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(
-                                    Lang.getMessage("actionbar.countdown").add("time", gameInstance.getWaitingTime()).toString()
-                            ));
+                    Lang.getMessage("actionbar.countdown").add("time", gameInstance.getWaitingTime()).sendActionbar(player);
                 }
                 --secondCounter;
                 if (secondCounter == 0) {
@@ -89,14 +88,10 @@ public class GameTask implements Runnable {
                 }
             } else {
                 for (var player : gameInstance.getPlayers().keySet()) {
-                    player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(
-                                    Lang.getMessage("actionbar.waiting-more-player")
-                                            .add("current", gameInstance.getAlivePlayers())
-                                            .add("least", gameInstance.getWorldConfig().getInt("least-player"))
-                                            .toString()
-                            )
-                    );
+                    Lang.getMessage("actionbar.waiting-more-player")
+                            .add("current", gameInstance.getAlivePlayers())
+                            .add("least", gameInstance.getWorldConfig().getInt("least-player"))
+                            .sendActionbar(player);
                 }
             }
         } else if (gameInstance.getState() == GameState.RUNNING) {
@@ -107,31 +102,29 @@ public class GameTask implements Runnable {
             }
 
             if (tick == 0) {
-                if(!hasTimedEvent){
-                    if ((event == null || event.isStopping())) {
-                        AbstractEvent newEvent;
-                        do {
-                            newEvent = randomEvent();
-                        } while (compare(newEvent, event));
-                        event = newEvent;
+                if ((event == null || event.isStopping())) {
+                    AbstractEvent newEvent;
+                    do {
+                        newEvent = randomEvent();
+                    } while (compare(newEvent, event));
+                    event = newEvent;
 
-                        String id = event.getID();
-                        boolean enabled = AbstractEvent.getEvents().getBoolean(id + ".end-in-duration.enable");
-                        int duration = AbstractEvent.getEvents().getInt(id + ".end-in-duration.duration");
-                        if (!enabled) event.execute(0);
-                        else event.execute(duration);
+                    String id = event.getID();
+                    boolean enabled = AbstractEvent.getEvents().getBoolean(id + ".end-in-duration.enable");
+                    int duration = AbstractEvent.getEvents().getInt(id + ".end-in-duration.duration");
+                    if (!enabled) event.execute(0);
+                    else event.execute(duration);
 
-                        if (!AbstractEvent.getEvents().getString(event.getID() + ".sound").equalsIgnoreCase("null")) {
-                            gameInstance.getPlayers().keySet().forEach(p ->
-                                    p.getPlayer().playSound(
-                                            p.getPlayer(),
-                                            Sound.valueOf(AbstractEvent.getEvents().getString(event.getID() + ".sound")),
-                                            SoundCategory.PLAYERS,
-                                            1.0f,
-                                            1.0f
-                                    )
-                            );
-                        }
+                    if (!AbstractEvent.getEvents().getString(event.getID() + ".sound").equalsIgnoreCase("null")) {
+                        gameInstance.getPlayers().keySet().forEach(p ->
+                                p.getPlayer().playSound(
+                                        p.getPlayer(),
+                                        Sound.valueOf(AbstractEvent.getEvents().getString(event.getID() + ".sound")),
+                                        SoundCategory.PLAYERS,
+                                        1.0f,
+                                        1.0f
+                                )
+                        );
                     }
                 }
 
@@ -145,13 +138,9 @@ public class GameTask implements Runnable {
                 gameInstance.getPlayers().forEach((player, state) -> {
                     if (state.equals(PlayerState.ALIVE)) {
                         gameInstance.incrementScore(player, Config.getInt("worlds-config.alive-award"));
-                        player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                                TextComponent.fromLegacyText(
-                                        Lang.getMessage("in-game.alive-award")
-                                                .add("award", Config.getInt("worlds-config.alive-award"))
-                                                .toString()
-                                )
-                        );
+                        Lang.getMessage("in-game.alive-award")
+                                .add("award", Config.getInt("worlds-config.alive-award"))
+                                .sendActionbar(player);
                     }
                 });
             }
