@@ -1,6 +1,28 @@
 name: LuckyItemFight
 version: '1.0'
-main: org.luckyItemFight.LuckyItemFight
+main: org.luckyItemFight.Main
 api-version: '1.20'
 authors: [ AluminumNitrate(AcidAluminum) with Jason31416 ]
-description: A Tower Battle in Minecraft
+description: ""
+commands:
+  join:
+    description: "join a game"
+    aliases: []
+    usage: "/join - 加入一个待开始房间"
+  leave:
+    description: "leave from a game"
+    aliases: []
+    usage: "/leave - 离开当前房间"
+  spectate:
+    description: "spectate a game"
+    aliases: []
+    usage: "/spectate <world> - 旁观某个房间"
+  shop:
+    description: "open shop menu"
+    aliases: []
+    usage: "/shop - 打开商店菜单"
+  database:
+    description: "do test/action about database"
+    permission: "luckyitemfight.database"
+    aliases: [db]
+    usage: "/database <sub> - 执行数据库相关操作"

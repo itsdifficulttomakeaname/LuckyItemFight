@@ -1,0 +1,145 @@
+# 一定要注意:所有multiExecute为false会导致程序死循环
+WitherEvent:
+  # @TimedEvent
+  run-after: 3600 # 180s -> 3min
+  spawn-location: "0.5,112.0,0.5"
+  sound: ENTITY_LIGHTNING_BOLT_THUNDER # null 没声音
+  show-name:
+    enable: true
+    type: subtitle # title | subtitle | chat
+    text: "<#FF4855>凋零降临!"
+  show-detail:
+    enable: true
+    type: chat
+    text: "<#FFFFFF>恐怖的生物降临在了这片土地上...\n(将在1min后消亡)"
+ArrowEvent:
+  possibility: 15
+  multiExecute: true
+  range: 5 #在 x +- range,z +- range中随机生成
+  duration: 3 # tick
+  height: 15 # 从多高落下
+  end-in-duration:
+    enable: true
+    duration: 180
+  sound: ENTITY_ARROW_SHOOT # null 没声音
+  show-name:
+    enable: true
+    type: subtitle # title | subtitle | chat
+    text: "<#FF4855>弓林箭雨!"
+  show-detail:
+    enable: true
+    type: chat
+    text: "<#FFFFFF>箭矢从天上四面八方射来..."
+BlockIsNotAllowedEvent:
+  possibility: 3
+  multiExecute: true
+  items:
+    - BAT_SPAWN_EGG
+    - BEE_SPAWN_EGG
+    - BLAZE_SPAWN_EGG
+    - CAT_SPAWN_EGG
+    - CAVE_SPIDER_SPAWN_EGG
+    - CHICKEN_SPAWN_EGG
+    - COD_SPAWN_EGG
+    - COW_SPAWN_EGG
+    - CREEPER_SPAWN_EGG
+    - DOLPHIN_SPAWN_EGG
+    - DONKEY_SPAWN_EGG
+    - DROWNED_SPAWN_EGG
+    - ELDER_GUARDIAN_SPAWN_EGG
+    - ENDERMAN_SPAWN_EGG
+    - ENDERMITE_SPAWN_EGG
+    - EVOKER_SPAWN_EGG
+    - FOX_SPAWN_EGG
+    - GHAST_SPAWN_EGG
+    - GUARDIAN_SPAWN_EGG
+    - HOGLIN_SPAWN_EGG
+    - HORSE_SPAWN_EGG
+    - HUSK_SPAWN_EGG
+    - LLAMA_SPAWN_EGG
+    - MAGMA_CUBE_SPAWN_EGG
+    - MOOSHROOM_SPAWN_EGG
+    - MULE_SPAWN_EGG
+    - OCELOT_SPAWN_EGG
+    - PANDA_SPAWN_EGG
+    - PARROT_SPAWN_EGG
+    - PHANTOM_SPAWN_EGG
+    - PIG_SPAWN_EGG
+    - PIGLIN_SPAWN_EGG
+    - PIGLIN_BRUTE_SPAWN_EGG
+    - PILLAGER_SPAWN_EGG
+    - POLAR_BEAR_SPAWN_EGG
+    - PUFFERFISH_SPAWN_EGG
+    - RABBIT_SPAWN_EGG
+    - RAVAGER_SPAWN_EGG
+    - SALMON_SPAWN_EGG
+    - SHEEP_SPAWN_EGG
+    - SHULKER_SPAWN_EGG
+    - SILVERFISH_SPAWN_EGG
+    - SKELETON_SPAWN_EGG
+    - SKELETON_HORSE_SPAWN_EGG
+    - SLIME_SPAWN_EGG
+    - SPIDER_SPAWN_EGG
+    - SQUID_SPAWN_EGG
+    - STRAY_SPAWN_EGG
+    - STRIDER_SPAWN_EGG
+    - TRADER_LLAMA_SPAWN_EGG
+    - TROPICAL_FISH_SPAWN_EGG
+    - TURTLE_SPAWN_EGG
+    - VEX_SPAWN_EGG
+    - VILLAGER_SPAWN_EGG
+    - VINDICATOR_SPAWN_EGG
+    - WANDERING_TRADER_SPAWN_EGG
+    - WITCH_SPAWN_EGG
+    - WITHER_SKELETON_SPAWN_EGG
+    - WOLF_SPAWN_EGG
+    - ZOGLIN_SPAWN_EGG
+    - ZOMBIE_SPAWN_EGG
+    - ZOMBIE_HORSE_SPAWN_EGG
+    - ZOMBIE_VILLAGER_SPAWN_EGG
+    - ZOMBIFIED_PIGLIN_SPAWN_EGG
+  allowed:
+    put: false
+    break: false
+  end-in-duration:
+    enable: true
+    duration: 300
+  sound: ENTITY_ARROW_SHOOT # null 没声音
+  show-name:
+    enable: true
+    type: subtitle # title | subtitle | chat
+    text: "<#FF4855>禁放区!"
+  show-detail:
+    enable: true
+    type: chat
+    text: "<#FFFFFF>没人给我说过这里不能放方块啊...\n但这些生成蛋是何意味...\n(15s后解除)"
+NightEvent:
+  possibility: 10
+  multiExecute: false
+  end-in-duration:
+    enable: true
+    duration: 60000
+  sound: "null" # null 没声音
+  show-name:
+    enable: true
+    type: subtitle # title | subtitle | chat
+    text: "<#FFFFFF> 黑夜降临..."
+  show-detail:
+    enable: true
+    type: chat
+    text: "<#FFFFFF>我们从来没有战胜黑夜...\n(5min后天亮)"
+NullEvent:
+  possibility: 50
+  multiExecute: true
+  end-in-duration:
+    enable: true
+    duration: 240
+  sound: "null" # null 没声音
+  show-name:
+    enable: false
+    type: subtitle # title | subtitle | chat
+    text: "<#FFFFFF> 无事发生..."
+  show-detail:
+    enable: false
+    type: chat
+    text: ""

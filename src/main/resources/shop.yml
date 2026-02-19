@@ -1,0 +1,69 @@
+title: "<#77F5AE>商店"
+1-1:
+  loc:
+    - 1,1
+  material: GREEN_STAINED_GLASS_PANE
+  name: ""
+  lore:
+    - "<#FFFFFF>左键/右键 购买 1 个"
+    - "<#FFFFFF>SHIFT + 左键/右键 购买 10 个"
+border:
+  loc: # x,y -> 第x行,第y个
+    - 1,2
+    - 1,3
+    - 1,4
+    - 1,5
+    - 1,6
+    - 1,7
+    - 1,8
+    - 1,9
+    - 2,1
+    - 2,9
+    - 3,1
+    - 3,9
+    - 4,1
+    - 4,9
+    - 5,1
+    - 5,9
+    - 6,1
+    - 6,2
+    - 6,3
+    - 6,4
+    - 6,5
+    - 6,6
+    - 6,7
+    - 6,8
+    - 6,9
+  material: BLACK_STAINED_GLASS_PANE
+  name: ""
+  lore: []
+  price: -1 # 非卖品
+dirt:
+  loc:
+    - 2,2
+  material: DIRT
+  name: "<#893D0A>泥土"
+  lore:
+    - "<#FFFFFF>廉价的垫脚方块"
+    - "<#FFFFFF>价格: 500"
+  price: 500
+glow-stone:
+  loc:
+    - 2,3
+  material: GLOWSTONE
+  name: "<#FFE429>萤石"
+  lore:
+    - "<#FFFFFF>会发光的方块"
+    - "<#FFFFFF>即使黑夜来临也不再怕(?"
+    - "<#FFFFFF>价格: 1000"
+  price: 1000
+water-bucket:
+  loc:
+    - 2,4
+  material: WATER_BUCKET
+  name: "<#4BD3F5>水桶"
+  lore:
+    - "<#FFFFFF>关键时刻救自己一命!"
+    - "<#FFFFFF>不过这个价格嘛..."
+    - "<#FFFFFF>价格: 4000"
+  price: 4000

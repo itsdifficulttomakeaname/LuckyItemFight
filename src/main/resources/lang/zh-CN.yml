@@ -4,9 +4,25 @@ common:
 
 command:
   leave-but-not-in-a-game: "<#F72828>错误: <#FFFFFF>你本来就不在一个房间里"
+  join-but-already-in-a-room: "<#F72828>错误: <#FFFFFF>你已经在一个房间里了"
+  room-is-full: "<#F72828>错误: <#FFFFFF>该房间已满，请稍等片刻再尝试加入其他房间"
+
+  cannot-open-shop-menu-in-game: "<#F72828>错误: <#FFFFFF>你不能在游戏中打开商店"
+  coin-not-enough: "<#F72828>错误: <#FFFFFF>金币不足"
+  cannot-buy-too-many: "<#F72828>错误: <#FFFFFF>你不能买超过1个的物品"
+  buy-success: "<#82FF99>成功购买了 %amount% 个 %material%"
+
+  no-such-player: "<#F72828>错误: <#FFFFFF>玩家无效"
+  update-success: "<#82FF99>成功将玩家 %player% 的 %placeholder% 设为了 %value%"
+  query-success: "<#82FF99>玩家 %player% 的 %placeholder% 的值为 %value%"
+  list-success:
+    - "<#82FF99>玩家 %player%"
+    - "<#82FF99>金币: %coin%"
+    - "<#82FF99>游玩次数: %play%"
+    - "<#82FF99>获胜次数: %win%"
+    - "<#82FF99>击杀数: %kill%"
 
 in-game:
-  leave: "<#F72828>- <#FFFFFF>玩家 %player% 离开了房间"
   eliminate: "<#82FF99> 玩家 %player% 淘汰了"
   eliminate-by-other: "<#82FF990> 玩家 %victim% 被 %killer% 淘汰了"
   alive-award: "<#82FF990> 你因为存活而获取了 %award% 积分"
@@ -14,12 +30,41 @@ in-game:
 
   leaderboard:
     header: "<#C7FF85>================游戏结算================"
-    _1st: "<#FFD700> %player% - [%score%] %it-is-me%"
-    _2nd: "<#E8E8E8> %player% - [%score%] %it-is-me%"
-    _3rd: "<#B87333> %player% - [%score%] %it-is-me%"
-    normal: "<#FFFFFF> %player% - [%score%] %it-is-me%"
-    it-is-me: "<#82FF990><- 你在这里"
+    _1st: "<#FFD700> %player% - [%score%] <#82FF990>%it-is-me%"
+    _2nd: "<#E8E8E8> %player% - [%score%] <#82FF990>%it-is-me%"
+    _3rd: "<#B87333> %player% - [%score%] <#82FF990>%it-is-me%"
+    normal: "<#FFFFFF> %player% - [%score%] <#82FF990>%it-is-me%"
+    it-is-me: "<- 你在这里" # 不要有颜色
     footer: "<#C7FF85>================游戏结算================"
+
+scoreboard:
+  title: "<#82FF990> 幸运物品大战"
+  lobby:
+    main: # 内部有防重实现，但是也有很低概率重复，建议这里不要重复
+      - "&a%player%"
+      - " "
+      - "&6金币: &b%coin%"
+      - "&6游玩次数: &b%play%"
+      - "&6获胜次数: &b%win%"
+      - "&6击杀数: &b%kill%"
+      - " "
+      - "&amc.simplycraft.top"
+  in-game:
+    main:
+      - "&a%player%"
+      - " "
+      - "&6击杀第一: %1stKiller% - %1stAmount%"
+      - "&6击杀第二: %2ndKiller% - %2ndAmount%"
+      - "&6击杀第三: %3rdKiller% - %3rdAmount%"
+      - " "
+      - "&6当前对局时间: &a%time%"
+      - "&6噩兆降临: %TimedEvent%"
+      - " "
+      - "&6你当前击杀: &a%kill%"
+      - "&6当前积分: &a%score%"
+      - " "
+      - "&amc.simplycraft.top"
 
 actionbar:
   countdown: "<#24EAFF>游戏将在 %time% 后开始"
+  waiting-more-player: "<#ADFF3F> 等待游戏开始... [%current%/%least%]"

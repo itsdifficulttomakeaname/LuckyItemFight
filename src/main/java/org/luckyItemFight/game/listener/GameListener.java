@@ -4,6 +4,8 @@ import cn.jason31416.planetlib.util.Lang;
 import cn.jason31416.planetlib.util.TimedHashMap;
 import cn.jason31416.planetlib.wrapper.SimplePlayer;
 import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -11,44 +13,57 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.meta.SpawnEggMeta;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.player.*;
+import org.luckyItemFight.Main;
+import org.luckyItemFight.game.event.BlockIsNotAllowedEvent;
 import org.luckyItemFight.game.main.GameInstance;
+import org.luckyItemFight.game.main.GameState;
+import org.luckyItemFight.manager.ScoreboardManager;
+import org.luckyItemFight.util.SpawnEggTypeGetter;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 @SuppressWarnings("deprecation")
 public class GameListener implements Listener {
-    private static final TimedHashMap<SimplePlayer, SimplePlayer> killSource = new TimedHashMap<>(30000); // {this -> source}
+    private static final TimedHashMap<SimplePlayer, SimplePlayer> killSource = new TimedHashMap<>(15000); // {this -> source}
     @Getter private static final HashMap<UUID, SimplePlayer> entityBelongings = new HashMap<>();
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        GameInstance.getPlayerInstances().put(SimplePlayer.of(e.getPlayer()), null);
         e.joinMessage(null);
-        for(var kv : GameInstance.getPlayerInstances().entrySet()) {
-            if(kv.getValue() == null) {
-                kv.getKey().sendMessage(Lang.getMessage("common.player-join").add("player", e.getPlayer().getName()));
-            }
-        }
+        e.getPlayer().getInventory().clear();
+        e.getPlayer().setGameMode(GameMode.ADVENTURE);
+        e.getPlayer().setExp(0);
+        e.getPlayer().setLevel(0);
+
+        UUID uuid = e.getPlayer().getUniqueId();
+
+        if(Main.dataBaseManager.query(String.valueOf(uuid), "play") == null) Main.dataBaseManager.insert(String.valueOf(uuid));
+
+        ScoreboardManager.getPlayerScoreboard().put(
+                SimplePlayer.of(e.getPlayer()),
+                new ScoreboardManager(
+                        SimplePlayer.of(e.getPlayer()),
+                        Lang.getMessage("scoreboard.title").toComponent()
+                )
+        );
+        e.getPlayer().teleport(Bukkit.getWorlds().getFirst().getSpawnLocation());
     }
 
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
         GameInstance gameInstance = GameInstance.getPlayerInstances().get(SimplePlayer.of(e.getPlayer()));
+        ScoreboardManager.getPlayerScoreboard().remove(SimplePlayer.of(e.getPlayer()));
         e.quitMessage(null);
         if (gameInstance != null) {
             gameInstance.leave(SimplePlayer.of(e.getPlayer()));
-        } else {
-            GameInstance.getPlayerInstances().forEach((k, v) -> {
-                if(v == null) k.sendMessage(Lang.getMessage("common.player-leave").add("player", e.getPlayer().getName()));
-            });
+            gameInstance.getPlayers().remove(SimplePlayer.of(e.getPlayer()));
         }
     }
 
@@ -68,6 +83,10 @@ public class GameListener implements Listener {
     public void onDamage(EntityDamageByEntityEvent e) {
         if(!(e.getEntity() instanceof Player player)) return;
         Entity damager = e.getDamager();
+        if(GameInstance.getPlayerInstances().get(SimplePlayer.of(player)) == null) {
+            e.setDamage(0);
+            return;
+        }
         if(damager instanceof Player p) {
             killSource.put(SimplePlayer.of(player), SimplePlayer.of(p));
         }else if(entityBelongings.containsKey(damager.getUniqueId())) {
@@ -76,16 +95,26 @@ public class GameListener implements Listener {
     }
 
     @EventHandler
-    public void onDeath(EntityDeathEvent e){
-        if(!(e.getEntity() instanceof Player player)) return;
+    public void onDamage(EntityDamageEvent e) {
+        if(e.getCause() == EntityDamageEvent.DamageCause.VOID) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e){
+        e.deathMessage(null);
+        Player player = e.getEntity();
         GameInstance gameInstance = GameInstance.getPlayerInstances().get(SimplePlayer.of(player));
-        if(gameInstance != null) {
-            SimplePlayer finalPlayer = killSource.get(SimplePlayer.of(player));
-            if(finalPlayer == null) {
+        if (gameInstance != null) {
+            if(!killSource.containsKey(SimplePlayer.of(player))) {
                 gameInstance.eliminate(SimplePlayer.of(player));
+                return;
             }
-            else {
-                gameInstance.eliminate(finalPlayer, SimplePlayer.of(player));
+            SimplePlayer finalPlayer = killSource.get(SimplePlayer.of(player));
+            if (finalPlayer == null) {
+                gameInstance.eliminate(SimplePlayer.of(player));
+            } else {
+                if(finalPlayer.equals(SimplePlayer.of(player))) gameInstance.eliminate(finalPlayer);
+                else gameInstance.eliminate(finalPlayer, SimplePlayer.of(player));
             }
         }
     }
@@ -95,12 +124,89 @@ public class GameListener implements Listener {
         if(e.getPlayer().getInventory().getItemInMainHand().getType().name().toUpperCase().endsWith("_SPAWN_EGG")) {
             GameInstance gameInstance = GameInstance.getPlayerInstances().get(SimplePlayer.of(e.getPlayer()));
             if(gameInstance == null) return;
-            EntityType type = ((SpawnEggMeta) e.getPlayer().getItemInHand()).getCustomSpawnedType();
+            EntityType type = SpawnEggTypeGetter.getEntityType(e.getPlayer().getItemInHand());
             Location loc = e.getInteractionPoint();
-            if(loc == null || type == null) return;
-            Entity entity = gameInstance.getGameWorld().spawnEntity(loc.clone().add(0,1,0), type);
+            if(loc == null) return;
+            if(type == null) return;
+            Entity entity;
+            entity = gameInstance.getGameWorld().spawnEntity(loc.clone(), type);
             entityBelongings.put(entity.getUniqueId(), SimplePlayer.of(e.getPlayer()));
             e.getPlayer().getInventory().getItemInMainHand().setAmount(e.getPlayer().getInventory().getItemInMainHand().getAmount()-1);
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        SimplePlayer simplePlayer = SimplePlayer.of(e.getPlayer());
+        GameInstance gameInstance = GameInstance.getPlayerInstances().get(simplePlayer);
+        if(gameInstance == null) return;
+        if(gameInstance.getState() == GameState.WAITING) {
+            Location from = e.getFrom();
+            Location to = e.getTo();
+
+            if(!compare(from, to)) e.setCancelled(true);
+        }
+    }
+
+    private boolean compare(Location l1, Location l2) {
+        return l1.getX() == l2.getX() && l1.getZ() == l2.getZ();
+    }
+
+    @EventHandler
+    public void onPlayerInventory(InventoryInteractEvent event){
+        GameInstance gameInstance = GameInstance.getPlayerInstances().get(SimplePlayer.of(event.getWhoClicked()));
+        if(gameInstance == null ||  gameInstance.getState() == GameState.WAITING) {
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void onPlayerInventory(InventoryClickEvent event){
+        GameInstance gameInstance = GameInstance.getPlayerInstances().get(SimplePlayer.of(event.getWhoClicked()));
+        if(gameInstance == null ||   gameInstance.getState() == GameState.WAITING) {
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void onPlayerInventory(PlayerSwapHandItemsEvent event){
+        GameInstance gameInstance = GameInstance.getPlayerInstances().get(SimplePlayer.of(event.getPlayer()));
+        if(gameInstance == null ||   gameInstance.getState() == GameState.WAITING) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onItemDrop(PlayerDropItemEvent event){
+        GameInstance gameInstance = GameInstance.getPlayerInstances().get(SimplePlayer.of(event.getPlayer()));
+        if(gameInstance == null ||   gameInstance.getState() == GameState.WAITING) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onHungerLevelChange(FoodLevelChangeEvent e) {
+        GameInstance gameInstance = GameInstance.getPlayerInstances().get(SimplePlayer.of(e.getEntity()));
+        if(gameInstance == null) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBreak(BlockBreakEvent e) {
+        GameInstance gameInstance = GameInstance.getPlayerInstances().get(SimplePlayer.of(e.getPlayer()));
+        if(gameInstance == null) {
+            e.setCancelled(true);
+        } else if(GameInstance.getGameTaskInstances().get(gameInstance).getEvent() instanceof BlockIsNotAllowedEvent) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlace(BlockPlaceEvent e) {
+        GameInstance gameInstance = GameInstance.getPlayerInstances().get(SimplePlayer.of(e.getPlayer()));
+        if(gameInstance == null) {
+            e.setCancelled(true);
+        } else if(GameInstance.getGameTaskInstances().get(gameInstance).getEvent() instanceof BlockIsNotAllowedEvent) {
             e.setCancelled(true);
         }
     }

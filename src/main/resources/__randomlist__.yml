@@ -1088,7 +1088,7 @@ items:
     - DRAGON_EGG
 
 weight:
-  weapons: 20
-  blocks: 48
-  spawnEggs: 24
-  specialItems: 8
+  weapons: 5
+  blocks: 87
+  spawnEggs: 5
+  specialItems: 3
