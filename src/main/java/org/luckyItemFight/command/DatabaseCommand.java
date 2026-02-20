@@ -1,7 +1,6 @@
 package org.luckyItemFight.command;
 
 import cn.jason31416.planetlib.message.Message;
-import cn.jason31416.planetlib.message.MessageList;
 import cn.jason31416.planetlib.util.Lang;
 import cn.jason31416.planetlib.wrapper.SimplePlayer;
 import org.bukkit.command.Command;
@@ -29,7 +28,7 @@ public class DatabaseCommand implements CommandExecutor, TabCompleter {
         }
         SimplePlayer player = SimplePlayer.of(commandSender);
         if (args.length < 1) {
-            player.sendMessage(sendHelp());
+            player.sendMessage(handleHelp());
             return true;
         }
         String sub1 = args[0];
@@ -52,18 +51,18 @@ public class DatabaseCommand implements CommandExecutor, TabCompleter {
             }
             player.sendMessage(handleList(args[1]));
         } else {
-            player.sendMessage(sendHelp());
+            player.sendMessage(handleHelp());
         }
         return true;
     }
 
-    Message sendHelp() {
+    Message handleHelp() {
         return Message.of("""
-        \n<#F72828>/db update <player> <placeholder> <val> - set <player>'s <placeholder> to <val>
+        \n<#F72828>/db update <player> <placeholder> <val> - set <player>'s <placeholder> to <val>(if placeholder exists)
         
-        <#F72828>/db query <player> <placeholder> - query <player>'s <placeholder>'s value
+        <#F72828>/db query <player> <placeholder> - query <player>'s <placeholder>'s value(return null if placeholder doesn't exist)
         
-        <#F72828>/db list <player> - list all value which <player> has
+        <#F72828>/db list <player> - list all value which <player> has(return null if player doesn't exist)
         """);
     }
 

@@ -29,9 +29,13 @@ public class ShopCommand implements CommandExecutor {
     public ShopCommand() {
         try {
             shopConfig = MapTree.fromYaml(Files.readString(new File(instance.getDataFolder(), "shop.yml").toPath()));
-            gui = new GUI(6, Message.of((String) shopConfig.get("title")).toComponent());
+            int click,shiftClick,maxAmount;
+            click = shopConfig.getInt("common.click");
+            shiftClick = shopConfig.getInt("common.shiftClick");
+            maxAmount = shopConfig.getInt("common.max-amount") - 1;
+            gui = new GUI(6, Message.of((String) shopConfig.get("common.title")).toComponent());
             shopConfig.getKeys().forEach(k -> {
-                if(k.equalsIgnoreCase("title")) return;
+                if(k.equalsIgnoreCase("common")) return;
                 shopConfig.getStringList(k + ".loc").forEach(l -> {
                     String[] loc = l.split(",");
                     if(loc.length < 2) return;
@@ -45,41 +49,41 @@ public class ShopCommand implements CommandExecutor {
                             )
                     );
                     if(shopConfig.getInt(k + ".price") == -1) return;
-                    gui.leftClick(x,y,(p,e) -> {
+                    gui.leftClick(x, y, (p,e) -> {
                         e.setCancelled(true);
-                        if(ShopManager.get(SimplePlayer.of(p), Material.valueOf(shopConfig.getString(k + ".material"))) > 0) {
+                        if(ShopManager.get(SimplePlayer.of(p), Material.valueOf(shopConfig.getString(k + ".material"))) > maxAmount) {
                             SimplePlayer.of(p).sendMessage(Lang.getMessage("command.cannot-buy-too-many"));
-                        } else if (!ShopManager.add(SimplePlayer.of(p),Material.valueOf(shopConfig.getString(k + ".material")),1, shopConfig.getInt(k + ".price"))) {
+                        } else if (!ShopManager.add(SimplePlayer.of(p),Material.valueOf(shopConfig.getString(k + ".material")), click, shopConfig.getInt(k + ".price"))) {
                             SimplePlayer.of(p).sendMessage(Lang.getMessage("command.coin-not-enough"));
                         } else {
-                            SimplePlayer.of(p).sendMessage(Lang.getMessage("command.buy-success").add("amount",1).add("material", Material.valueOf(shopConfig.getString(k + ".material")).name()));
+                            SimplePlayer.of(p).sendMessage(Lang.getMessage("command.buy-success").add("amount",click).add("material", Material.valueOf(shopConfig.getString(k + ".material")).name()));
                         }
                     }).rightClick(x,y,(p,e) -> {
                         e.setCancelled(true);
-                        if(ShopManager.get(SimplePlayer.of(p), Material.valueOf(shopConfig.getString(k + ".material"))) > 0) {
+                        if(ShopManager.get(SimplePlayer.of(p), Material.valueOf(shopConfig.getString(k + ".material"))) > maxAmount) {
                             SimplePlayer.of(p).sendMessage(Lang.getMessage("command.cannot-buy-too-many"));
-                        } else if(!ShopManager.add(SimplePlayer.of(p),Material.valueOf(shopConfig.getString(k + ".material")),1, shopConfig.getInt(k + ".price"))) {
+                        } else if(!ShopManager.add(SimplePlayer.of(p),Material.valueOf(shopConfig.getString(k + ".material")), click, shopConfig.getInt(k + ".price"))) {
                             SimplePlayer.of(p).sendMessage(Lang.getMessage("command.coin-not-enough"));
                         } else {
-                            SimplePlayer.of(p).sendMessage(Lang.getMessage("command.buy-success").add("amount",1).add("material", Material.valueOf(shopConfig.getString(k + ".material")).name()));
+                            SimplePlayer.of(p).sendMessage(Lang.getMessage("command.buy-success").add("amount",click).add("material", Material.valueOf(shopConfig.getString(k + ".material")).name()));
                         }
                     }).shiftLeftClick(x,y,(p,e) -> {
                         e.setCancelled(true);
-                        if(ShopManager.get(SimplePlayer.of(p), Material.valueOf(shopConfig.getString(k + ".material"))) > 0) {
+                        if(ShopManager.get(SimplePlayer.of(p), Material.valueOf(shopConfig.getString(k + ".material"))) > maxAmount) {
                             SimplePlayer.of(p).sendMessage(Lang.getMessage("command.cannot-buy-too-many"));
-                        } else if(!ShopManager.add(SimplePlayer.of(p),Material.valueOf(shopConfig.getString(k + ".material")),10, shopConfig.getInt(k + ".price"))) {
+                        } else if(!ShopManager.add(SimplePlayer.of(p),Material.valueOf(shopConfig.getString(k + ".material")), shiftClick, shopConfig.getInt(k + ".price"))) {
                             SimplePlayer.of(p).sendMessage(Lang.getMessage("command.coin-not-enough"));
                         } else {
-                            SimplePlayer.of(p).sendMessage(Lang.getMessage("command.buy-success").add("amount",10).add("material", Material.valueOf(shopConfig.getString(k + ".material")).name()));
+                            SimplePlayer.of(p).sendMessage(Lang.getMessage("command.buy-success").add("amount",shiftClick).add("material", Material.valueOf(shopConfig.getString(k + ".material")).name()));
                         }
                     }).shiftRightClick(x,y,(p,e) -> {
                         e.setCancelled(true);
-                        if(ShopManager.get(SimplePlayer.of(p), Material.valueOf(shopConfig.getString(k + ".material"))) > 0) {
+                        if(ShopManager.get(SimplePlayer.of(p), Material.valueOf(shopConfig.getString(k + ".material"))) > maxAmount) {
                             SimplePlayer.of(p).sendMessage(Lang.getMessage("command.cannot-buy-too-many"));
-                        } else if(!ShopManager.add(SimplePlayer.of(p),Material.valueOf(shopConfig.getString(k + ".material")),10, shopConfig.getInt(k + ".price"))) {
+                        } else if(!ShopManager.add(SimplePlayer.of(p),Material.valueOf(shopConfig.getString(k + ".material")), shiftClick, shopConfig.getInt(k + ".price"))) {
                             SimplePlayer.of(p).sendMessage(Lang.getMessage("command.coin-not-enough"));
                         } else {
-                            SimplePlayer.of(p).sendMessage(Lang.getMessage("command.buy-success").add("amount",10).add("material", Material.valueOf(shopConfig.getString(k + ".material")).name()));
+                            SimplePlayer.of(p).sendMessage(Lang.getMessage("command.buy-success").add("amount",shiftClick).add("material", Material.valueOf(shopConfig.getString(k + ".material")).name()));
                         }
                     });
                 });

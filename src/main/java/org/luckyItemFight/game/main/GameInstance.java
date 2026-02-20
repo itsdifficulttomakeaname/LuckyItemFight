@@ -67,9 +67,8 @@ public class GameInstance {
     }
 
     @Getter private final World gameWorld;
-    @Getter private static final Map<String,List<Material>> materials = new HashMap<>();
+    @Getter private static final Map<String, List<Material>> materials = new HashMap<>();
     @Getter private static final Map<String, Integer> chances = new HashMap<>();
-
 
     @Getter @Setter private int waitingTime = Integer.MAX_VALUE;
     @Getter @Setter private GameState state = GameState.WAITING;
@@ -122,16 +121,16 @@ public class GameInstance {
 
     private void loadConfig() {
         List<String> spawnLocations = getWorldConfig().getStringList("spawn-locations");
-        if(spawnLocations == null) throw new PluginException("Config's Section Doesn't Exist", "configurationSection \"spawn-locations\" doesn't exist");
+        if(spawnLocations == null) throw new PluginException("ERROR While Loading", "configurationSection \"spawn-locations\" doesn't exist");
         for(String arg : spawnLocations) {
-            String[] split = arg.split(",");
-            if(split.length < 3) throw new PluginException("ERROR While Loading", "found a spawn-location with fewer than 3 arguments");
+            String[] stringLoc = arg.split(",");
+            if(stringLoc.length < 3) throw new PluginException("ERROR While Loading", "found a spawn-location with fewer than 3 arguments");
 
             try {
                 double _x,_y,_z;
-                _x = Double.parseDouble(split[0]);
-                _y = Double.parseDouble(split[1]);
-                _z = Double.parseDouble(split[2]);
+                _x = Double.parseDouble(stringLoc[0]);
+                _y = Double.parseDouble(stringLoc[1]);
+                _z = Double.parseDouble(stringLoc[2]);
                 this.spawnLocations.add(new Pair<>(SimpleLocation.of(_x, _y, _z, SimpleWorld.of(gameWorld)), null));
             } catch (NumberFormatException e) {
                 throw new PluginException("ERROR While Loading", "couldn't parse the key to double", e);
@@ -181,7 +180,7 @@ public class GameInstance {
             } else {
                 player.getPlayer().setGameMode(GameMode.SPECTATOR);
                 String[] stringLoc = getWorldConfig().getString("spectator-spawn-location").split(",");
-                if(stringLoc.length < 3) throw new PluginException("ERROR While Playing", "Cannot correctly get spectator's spawn location[1]");
+                if(stringLoc.length < 3) throw new PluginException("ERROR While Playing", "Cannot correctly get spectator's spawn location (Flag [1])");
                 Location loc = new Location(
                         gameWorld,
                         Double.parseDouble(stringLoc[0]),
@@ -196,7 +195,7 @@ public class GameInstance {
             players.put(player, playerState);
             player.getPlayer().setGameMode(GameMode.SPECTATOR);
             String[] stringLoc = getWorldConfig().getString("spectator-spawn-location").split(",");
-            if(stringLoc.length < 3) throw new PluginException("ERROR While Playing", "Cannot correctly get spectator's spawn location[2]");
+            if(stringLoc.length < 3) throw new PluginException("ERROR While Playing", "Cannot correctly get spectator's spawn location (Flag [2])");
             Location loc = new Location(
                     gameWorld,
                     Double.parseDouble(stringLoc[0]),
@@ -210,7 +209,8 @@ public class GameInstance {
     }
 
     public void leave(SimplePlayer player) {
-        PlayerState _state = players.get(player);
+        PlayerState _state = null;
+        if(players.containsKey(player)) _state = players.get(player);
         GameListener.getEntityBelongings().entrySet().removeIf(entry -> entry.getValue().equals(player));
         players.remove(player);
         if(_state != null && _state.equals(PlayerState.ALIVE)) --alivePlayers;
@@ -235,8 +235,9 @@ public class GameInstance {
     public void eliminate(SimplePlayer player) {
         -- alivePlayers;
         players.put(player, PlayerState.DEAD);
-        player.getPlayer().setGameMode(GameMode.SPECTATOR);
         if (player.isOnline()) {
+            player.getPlayer().setGameMode(GameMode.SPECTATOR);
+            player.getPlayer().getInventory().clear();
             String[] ret = getWorldConfig().getString("spectator-spawn-location").split(",");
             if(ret.length < 3) throw new PluginException("ERROR While Playing", "Spectator's spawn-location has fewer than 3 arguments!");
             SimpleLocation loc = SimpleLocation.of(
@@ -258,23 +259,25 @@ public class GameInstance {
         players.put(victim, PlayerState.DEAD);
         if (victim.isOnline()) {
             victim.getPlayer().setGameMode(GameMode.SPECTATOR);
+            victim.getPlayer().getInventory().clear();
             String[] ret = getWorldConfig().getString("spectator-spawn-location").split(",");
             if(ret.length < 3) throw new PluginException("ERROR While Playing", "Spectator's spawn-location has fewer than 3 arguments!");
             SimpleLocation loc = SimpleLocation.of(
                     Double.parseDouble(ret[0]),
                     Double.parseDouble(ret[1]),
                     Double.parseDouble(ret[2]),
-                    SimpleWorld.of(gameWorld));
+                    SimpleWorld.of(gameWorld)
+            );
             victim.teleport(loc);
         }
         for(SimplePlayer p : players.keySet()) {
             p.sendMessage(Lang.getMessage("in-game.eliminate-by-other").add("killer", killer.getName()).add("victim", victim.getName()));
         }
-        scores.put(killer, scores.get(killer) + Config.getInt("worlds-config.kill-award"));
+        scores.merge(killer, Config.getInt("worlds-config.kill-award"), Integer::sum);
         killer.getPlayer().playSound(killer.getPlayer(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 2f, 2f);
         killer.sendMessage(Lang.getMessage("in-game.kill-award").add("award", Config.getInt("worlds-config.kill-award")));
 
-        Killer.killerInstance.get(killer).kill ++;
+        ++ Killer.killerInstance.get(killer).kill;
 
         leaderboard.add(victim);
     }
@@ -515,7 +518,7 @@ public class GameInstance {
                 }
 
                 if (Bukkit.unloadWorld(world, false)) {
-                    Bukkit.getScheduler().runTaskLater(instance, () -> {
+                    PlanetLib.getScheduler().runLater(() -> {
                         try {
                             FileUtils.deleteDirectory(new File(world));
                         } catch (IOException e) {

@@ -11,7 +11,7 @@ import org.luckyItemFight.game.main.GameInstance;
 
 public class LeaveCommand implements CommandExecutor {
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if(!(commandSender instanceof Player)) {
             commandSender.sendMessage("该指令只能由玩家执行!");
             return true;

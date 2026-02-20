@@ -1,4 +1,9 @@
-title: "<#77F5AE>商店"
+common:
+  title: "<#77F5AE>商店"
+  click: 1 # 左/右键购买个数
+  shift-click: 5 # shift + 左/右键购买个数
+  max-amount: 5 # 最多能买几个
+
 1-1:
   loc:
     - 1,1
