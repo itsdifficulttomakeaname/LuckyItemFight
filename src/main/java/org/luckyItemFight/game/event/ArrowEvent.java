@@ -17,7 +17,7 @@ public class ArrowEvent extends AbstractEvent{
     private GameInstance gameInstance;
     private WrappedTask task;
     private WrappedTask gameTask;
-    private final static MapTree config = getEvents().getSection("ArrowEvent");
+    private final static MapTree config = getEventsConfig().getSection("ArrowEvent");
 
     public ArrowEvent(GameInstance gameInstance) {
         this.gameInstance = gameInstance;

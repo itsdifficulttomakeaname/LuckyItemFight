@@ -5,7 +5,6 @@ import cn.jason31416.planetlib.util.MapTree;
 import cn.jason31416.planetlib.wrapper.SimplePlayer;
 import lombok.Getter;
 import net.kyori.adventure.title.Title;
-import org.luckyItemFight.Main;
 import org.luckyItemFight.exception.PluginException;
 import org.luckyItemFight.game.main.GameInstance;
 
@@ -16,7 +15,7 @@ import java.nio.file.Files;
 import static org.luckyItemFight.Main.instance;
 
 public abstract class AbstractEvent{
-    @Getter private static MapTree events;
+    @Getter private static MapTree eventsConfig;
     @Getter boolean stopping = false;
     static final String TITLE = "title";
     static final String SUBTITLE = "subtitle";
@@ -79,7 +78,7 @@ public abstract class AbstractEvent{
 
     public static void init() {
         try {
-            events = MapTree.fromYaml(Files.readString(new File(instance.getDataFolder(), "__event__.yml").toPath()));
+            eventsConfig = MapTree.fromYaml(Files.readString(new File(instance.getDataFolder(), "__event__.yml").toPath()));
         } catch (IOException e) {
             throw new PluginException("ERROR While Loading","Cannot initialize __event__.yml",e);
         }

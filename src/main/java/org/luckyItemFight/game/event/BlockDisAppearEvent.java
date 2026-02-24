@@ -7,10 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.luckyItemFight.game.main.GameInstance;
 import org.luckyItemFight.game.main.PlayerState;
-import org.luckyItemFight.util.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -19,7 +16,7 @@ public class BlockDisAppearEvent extends AbstractEvent{
     private GameInstance gameInstance;
     private WrappedTask task;
     private WrappedTask gameTask;
-    private final MapTree config = getEvents().getSection("BlockDisAppearEvent");
+    private final MapTree config = getEventsConfig().getSection("BlockDisAppearEvent");
 
     public BlockDisAppearEvent(GameInstance gameInstance) {
         this.gameInstance = gameInstance;

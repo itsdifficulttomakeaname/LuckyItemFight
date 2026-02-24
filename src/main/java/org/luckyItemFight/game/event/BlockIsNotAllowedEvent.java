@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class BlockIsNotAllowedEvent extends AbstractEvent{
     private GameInstance gameInstance;
     private WrappedTask task;
-    private static final MapTree config = getEvents().getSection("BlockIsNotAllowedEvent");
+    private static final MapTree config = getEventsConfig().getSection("BlockIsNotAllowedEvent");
 
     public BlockIsNotAllowedEvent(GameInstance gameInstance) {
         this.gameInstance = gameInstance;

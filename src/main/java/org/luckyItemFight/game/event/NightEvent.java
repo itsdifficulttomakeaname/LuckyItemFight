@@ -11,7 +11,7 @@ public class NightEvent extends AbstractEvent{
     private GameInstance gameInstance;
     private WrappedTask task;
     private WrappedTask gameTask;
-    private static final MapTree config = getEvents().getSection("NightEvent");
+    private static final MapTree config = getEventsConfig().getSection("NightEvent");
 
     public NightEvent(GameInstance gameInstance) {
         this.gameInstance = gameInstance;

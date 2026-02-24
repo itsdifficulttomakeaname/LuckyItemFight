@@ -9,7 +9,7 @@ import org.luckyItemFight.game.main.GameInstance;
 import java.util.concurrent.TimeUnit;
 
 public class NullEvent extends AbstractEvent{
-    @Getter private final static MapTree config = getEvents().getSection("NullEvent");
+    @Getter private final static MapTree config = getEventsConfig().getSection("NullEvent");
     private GameInstance gameInstance;
     private WrappedTask task;
 

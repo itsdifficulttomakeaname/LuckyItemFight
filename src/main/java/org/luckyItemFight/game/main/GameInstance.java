@@ -111,8 +111,8 @@ public class GameInstance {
         worldInstances.put(world.getName(), this);
         killerLeaderboard.put(this, new ArrayList<>());
         startingInstance = this;
-        AbstractEvent.getEvents().getKeys().forEach(k -> events.put(k, AbstractEvent.getEvents().getInt(k + ".possibility")));
-        AbstractEvent.getEvents().getStringList("BlockIsNotAllowedEvent.items").forEach(s -> BlockIsNotAllowedEventMaterial.add(Material.valueOf(s)));
+        AbstractEvent.getEventsConfig().getKeys().forEach(k -> events.put(k, AbstractEvent.getEventsConfig().getInt(k + ".possibility")));
+        AbstractEvent.getEventsConfig().getStringList("BlockIsNotAllowedEvent.items").forEach(s -> BlockIsNotAllowedEventMaterial.add(Material.valueOf(s)));
         loadConfig();
 
         // 实例主循环(生命周期持续到本局游戏结束)
@@ -369,8 +369,9 @@ public class GameInstance {
             Main.dataBaseManager.update(uuidOfPlayer, "kill", (int) mp.get("kill") + Killer.killerInstance.get(SimplePlayer.of(p)).kill());
         });
         File worldFolder = new File(gameWorld.getName());
-        if(Bukkit.unloadWorld(gameWorld, true)) {
-            Bukkit.getScheduler().runTaskLater(instance, () -> {
+        if(!gameWorld.getPlayers().isEmpty()) gameWorld.getPlayers().forEach(p -> p.teleport(Bukkit.getWorlds().getFirst().getSpawnLocation()));
+        if(Bukkit.unloadWorld(gameWorld, false)) {
+            PlanetLib.getScheduler().runLater(() -> {
                 try {
                     FileUtils.deleteDirectory(worldFolder);
                 } catch (IOException ignored) {}
@@ -490,7 +491,7 @@ public class GameInstance {
                                 .add("kill", Killer.killerInstance.get(player).kill())
                                 .add("score", GameInstance.getPlayerInstances().get(player).scores.get(player))
                                 .add("time", time)
-                                .add("TimedEvent", AbstractEvent.getEvents().getInt("WitherEvent.run-after") / 20 < time ? "&c已生成" : "&a" + (AbstractEvent.getEvents().getInt("WitherEvent.run-after") / 20 - time))
+                                .add("TimedEvent", AbstractEvent.getEventsConfig().getInt("WitherEvent.run-after") / 20 < time ? "&c已生成" : "&a" + (AbstractEvent.getEventsConfig().getInt("WitherEvent.run-after") / 20 - time))
                                 .asList();
                         int i=1;
                         for(String line : lines) {
@@ -534,7 +535,6 @@ public class GameInstance {
                         p.setGameMode(GameMode.ADVENTURE);
                         p.getInventory().clear();
                     });
-
                 }
 
                 if(!new File(world).exists()) canDelete.add(world);

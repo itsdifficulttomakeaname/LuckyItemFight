@@ -4,10 +4,6 @@ import cn.jason31416.planetlib.util.Config;
 import cn.jason31416.planetlib.util.Lang;
 import cn.jason31416.planetlib.wrapper.SimplePlayer;
 import lombok.Getter;
-import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.audience.Audiences;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -23,7 +19,6 @@ import org.luckyItemFight.manager.ShopManager;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-@SuppressWarnings("deprecation")
 public class GameTask implements Runnable {
     private final GameInstance gameInstance;
     private int tick;
@@ -97,7 +92,7 @@ public class GameTask implements Runnable {
         } else if (gameInstance.getState() == GameState.RUNNING) {
             if (gameInstance.getAlivePlayers() <= 1) {
                 gameInstance.endGame();
-                event.stop();
+                if(event != null) event.stop();
                 return;
             }
 
@@ -110,16 +105,16 @@ public class GameTask implements Runnable {
                     event = newEvent;
 
                     String id = event.getID();
-                    boolean enabled = AbstractEvent.getEvents().getBoolean(id + ".end-in-duration.enable");
-                    int duration = AbstractEvent.getEvents().getInt(id + ".end-in-duration.duration");
+                    boolean enabled = AbstractEvent.getEventsConfig().getBoolean(id + ".end-in-duration.enable");
+                    int duration = AbstractEvent.getEventsConfig().getInt(id + ".end-in-duration.duration");
                     if (!enabled) event.execute(0);
                     else event.execute(duration);
 
-                    if (!AbstractEvent.getEvents().getString(event.getID() + ".sound").equalsIgnoreCase("null")) {
+                    if (!AbstractEvent.getEventsConfig().getString(event.getID() + ".sound").equalsIgnoreCase("null")) {
                         gameInstance.getPlayers().keySet().forEach(p ->
                                 p.getPlayer().playSound(
                                         p.getPlayer(),
-                                        Sound.valueOf(AbstractEvent.getEvents().getString(event.getID() + ".sound")),
+                                        Sound.valueOf(AbstractEvent.getEventsConfig().getString(event.getID() + ".sound")),
                                         SoundCategory.PLAYERS,
                                         1.0f,
                                         1.0f
@@ -151,10 +146,10 @@ public class GameTask implements Runnable {
             }
             -- secondCounter;
 
-            if(currentGameTime >= AbstractEvent.getEvents().getInt("WitherEvent.run-after") / 20 && !hasTimedEvent) {
+            if(currentGameTime >= AbstractEvent.getEventsConfig().getInt("WitherEvent.run-after") / 20 && !hasTimedEvent) {
                 event = new WitherEvent(gameInstance);
                 hasTimedEvent = true;
-                event.execute(Integer.MAX_VALUE);
+                event.execute(0);
             }
         }
     }
@@ -212,22 +207,22 @@ public class GameTask implements Runnable {
     private boolean compare(AbstractEvent e1, AbstractEvent e2) {
         if (e2 == null) return false;
         else if (e1.getID().equalsIgnoreCase("ArrowEvent")) {
-            if (!AbstractEvent.getEvents().getBoolean("ArrowEvent.multiExecute") && hasAppearedArrow) {
+            if (!AbstractEvent.getEventsConfig().getBoolean("ArrowEvent.multiExecute") && hasAppearedArrow) {
                 return true;
             }
             hasAppearedArrow = true;
         } else if (e1.getID().equalsIgnoreCase("NullEvent")) {
-            if (!AbstractEvent.getEvents().getBoolean("NullEvent.multiExecute") && hasAppearedNull) {
+            if (!AbstractEvent.getEventsConfig().getBoolean("NullEvent.multiExecute") && hasAppearedNull) {
                 return true;
             }
             hasAppearedNull = true;
         } else if (e1.getID().equalsIgnoreCase("BlockIsNotAllowedEvent")) {
-            if (!AbstractEvent.getEvents().getBoolean("BlockIsNotAllowedEvent.multiExecute") && hasAppearedBlockIsNotAllowed) {
+            if (!AbstractEvent.getEventsConfig().getBoolean("BlockIsNotAllowedEvent.multiExecute") && hasAppearedBlockIsNotAllowed) {
                 return true;
             }
             hasAppearedBlockIsNotAllowed = true;
         } else if (e1.getID().equalsIgnoreCase("NightEvent")) {
-            if(!AbstractEvent.getEvents().getBoolean("NightEvent.multiExecute") && hasNightEvent) {
+            if(!AbstractEvent.getEventsConfig().getBoolean("NightEvent.multiExecute") && hasNightEvent) {
                 return true;
             }
             hasNightEvent = true;
