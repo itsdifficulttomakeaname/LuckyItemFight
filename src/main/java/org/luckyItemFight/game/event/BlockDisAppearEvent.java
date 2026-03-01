@@ -12,7 +12,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-public class BlockDisAppearEvent extends AbstractEvent{
+public class BlockDisAppearEvent extends AbstractEvent {
     private GameInstance gameInstance;
     private WrappedTask task;
     private WrappedTask gameTask;
