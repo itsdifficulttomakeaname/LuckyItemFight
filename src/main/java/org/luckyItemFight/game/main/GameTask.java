@@ -25,11 +25,13 @@ public class GameTask implements Runnable {
     private int secondCounter = 20;
     @Getter private int currentGameTime = 0;
     @Getter private AbstractEvent event = null;
+    @Getter private AbstractEvent timeEvent = null;
     private int totalWeight = 0;
     private boolean hasAppearedArrow = false;
     private boolean hasAppearedNull = false;
     private boolean hasAppearedBlockIsNotAllowed = false;
     private boolean hasNightEvent = false;
+    private boolean hasBlockDisAppear = false;
     private boolean hasTimedEvent = false;
 
     public GameTask(GameInstance gameInstance) {
@@ -93,6 +95,7 @@ public class GameTask implements Runnable {
             if (gameInstance.getAlivePlayers() <= 1) {
                 gameInstance.endGame();
                 if(event != null) event.stop();
+                if(timeEvent != null) timeEvent.stop();
                 return;
             }
 
@@ -147,9 +150,9 @@ public class GameTask implements Runnable {
             -- secondCounter;
 
             if(currentGameTime >= AbstractEvent.getEventsConfig().getInt("WitherEvent.run-after") / 20 && !hasTimedEvent) {
-                event = new WitherEvent(gameInstance);
+                timeEvent = new WitherEvent(gameInstance);
+                timeEvent.execute(0);
                 hasTimedEvent = true;
-                event.execute(0);
             }
         }
     }
@@ -226,6 +229,11 @@ public class GameTask implements Runnable {
                 return true;
             }
             hasNightEvent = true;
+        } else if (e1.getID().equalsIgnoreCase("BlockDisAppear")) {
+            if(!AbstractEvent.getEventsConfig().getBoolean("BlockDisAppearEvent.multiExecute") && hasBlockDisAppear) {
+                return true;
+            }
+            hasBlockDisAppear = true;
         }
         return false;
     }

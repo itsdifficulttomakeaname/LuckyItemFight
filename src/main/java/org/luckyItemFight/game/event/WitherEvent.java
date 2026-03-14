@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 public class WitherEvent extends AbstractEvent{
     private GameInstance gameInstance;
-    private WrappedTask task;
+//    private WrappedTask task;
     private final static MapTree config = getEventsConfig().getSection("WitherEvent");
 
     private Entity wither;
@@ -37,7 +37,7 @@ public class WitherEvent extends AbstractEvent{
     @Override
     public void execute(int duration) {
         execute();
-        task = PlanetLib.getScheduler().runLater(this::stop, duration*50L, TimeUnit.MILLISECONDS);
+//        task = PlanetLib.getScheduler().runLater(this::stop, duration*50L, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -46,14 +46,14 @@ public class WitherEvent extends AbstractEvent{
         stopping = true;
 
 //        新实现这里被用作时间事件，不清理
-//        if(wither != null && wither.isValid()) {
-//            wither.remove();
-//            wither = null;
-//        }
-        if(task != null && !task.isCancelled()) {
-            task.cancel();
-            task = null;
+        if(wither != null && wither.isValid()) {
+            wither.remove();
+            wither = null;
         }
+//        if(task != null && !task.isCancelled()) {
+//            task.cancel();
+//            task = null;
+//        }
         gameInstance = null;
     }
 

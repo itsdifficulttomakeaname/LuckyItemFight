@@ -111,7 +111,11 @@ public class GameInstance {
         worldInstances.put(world.getName(), this);
         killerLeaderboard.put(this, new ArrayList<>());
         startingInstance = this;
-        AbstractEvent.getEventsConfig().getKeys().forEach(k -> events.put(k, AbstractEvent.getEventsConfig().getInt(k + ".possibility")));
+        AbstractEvent.getEventsConfig().getKeys().forEach(k -> {
+            if(!k.equalsIgnoreCase("WitherEvent")) {
+                events.put(k, AbstractEvent.getEventsConfig().getInt(k + ".possibility"));
+            }
+        });
         AbstractEvent.getEventsConfig().getStringList("BlockIsNotAllowedEvent.items").forEach(s -> BlockIsNotAllowedEventMaterial.add(Material.valueOf(s)));
         loadConfig();
 

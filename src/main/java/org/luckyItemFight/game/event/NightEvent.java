@@ -3,6 +3,8 @@ package org.luckyItemFight.game.event;
 import cn.jason31416.planetlib.PlanetLib;
 import cn.jason31416.planetlib.lib.folialib.wrapper.task.WrappedTask;
 import cn.jason31416.planetlib.util.MapTree;
+import org.bukkit.Difficulty;
+import org.bukkit.GameRule;
 import org.luckyItemFight.game.main.GameInstance;
 
 import java.util.concurrent.TimeUnit;
@@ -19,6 +21,7 @@ public class NightEvent extends AbstractEvent{
 
     @Override
     void execute() {
+        gameInstance.getGameWorld().setDifficulty(Difficulty.HARD);
         gameTask = PlanetLib.getScheduler().runTimer(new Runnable() {
             long t = 6000L;
 

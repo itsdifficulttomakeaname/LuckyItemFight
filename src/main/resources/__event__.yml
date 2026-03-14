@@ -118,7 +118,7 @@ NightEvent:
   multiExecute: false
   end-in-duration:
     enable: true
-    duration: 60000
+    duration: 2400
   sound: "null" # null 没声音
   show-name:
     enable: true
@@ -127,12 +127,12 @@ NightEvent:
   show-detail:
     enable: true
     type: chat
-    text: "<#FFFFFF>我们从来没有战胜黑夜...\n(5min后天亮)"
+    text: "<#FFFFFF>我们从来没有战胜黑夜...\n(2min后天亮)"
 BlockDisAppearEvent:
-  possibility: 5
+  possibility: 100
   multiExecute: true
   executePerXTick: 4 # 4 ticks 执行一次
-  executeTimes: 10 # 执行十次
+  executeTimes: 20 # 执行十次
   end-in-duration:
     enable: false # 不推荐启用
     duration: 240
@@ -144,7 +144,7 @@ BlockDisAppearEvent:
   show-detail:
     enable: true
     type: chat
-    text: "周围的方块逐渐消失\n不过不用担心掉下去qwqqqqq\n(执行10次)"
+    text: "周围的方块逐渐消失\n不过不用担心掉下去qwqqqqq\n(执行20次)"
 NullEvent:
   possibility: 50
   multiExecute: true
